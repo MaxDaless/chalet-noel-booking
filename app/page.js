@@ -461,9 +461,50 @@ export default function ChaletBooking() {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Chalet Booking</h1>
-          <form onSubmit={handleLogin} className="space-y-4">
+        <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full overflow-hidden">
+          <div className="grid md:grid-cols-2 gap-0">
+            {/* Left side - Image */}
+            <div className="relative h-64 md:h-auto">
+              <img
+                src="/chalet.jpg"
+                alt="Chalet Noel"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+                <p className="text-sm font-medium">480 route 329</p>
+                <p className="text-xs">Saint-Donat-de-Montcalm</p>
+              </div>
+            </div>
+
+            {/* Right side - Login form */}
+            <div className="p-8">
+              <h1 className="text-3xl font-bold text-gray-800 mb-4 text-center">Chalet Booking</h1>
+
+              {/* Chalet Info */}
+              <div className="bg-blue-50 rounded-lg p-4 mb-6 text-sm">
+                <h3 className="font-bold text-gray-800 mb-2">Accommodation</h3>
+                <p className="font-semibold text-blue-700 mb-2">11 beds</p>
+                <ul className="space-y-1 text-gray-700 mb-3">
+                  <li>• 2 rooms with double beds</li>
+                  <li>• 1 room with 2 double beds</li>
+                  <li>• Mezzanine with single bed + convertible couch</li>
+                </ul>
+                <p className="font-semibold text-gray-800 mb-1">Bathrooms</p>
+                <ul className="space-y-1 text-gray-700 mb-3">
+                  <li>• 1 full bathroom (bath, sink, wc)</li>
+                  <li>• 1 half bath (sink, wc, washer/dryer)</li>
+                </ul>
+                <a
+                  href="https://clubpleinairsaint-donat.org/wp-content/uploads/2025/05/clubpleinairsaint-donat-carte_verso_2024_v3.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  📍 View Trail Map
+                </a>
+              </div>
+
+              <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <input
@@ -505,6 +546,8 @@ export default function ChaletBooking() {
               </button>
             </form>
           )}
+            </div>
+          </div>
         </div>
       </div>
     )
