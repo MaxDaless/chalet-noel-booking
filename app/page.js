@@ -549,21 +549,21 @@ export default function ChaletBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg mb-4 sm:mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-3xl font-bold text-gray-800">Chalet Booking</h1>
-            <div className="flex gap-4 items-center">
-              <span className="text-sm text-gray-600">Logged in as: <strong>{email}</strong></span>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">Chalet Booking</h1>
+            <div className="flex gap-2 sm:gap-4 items-center">
+              <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Logged in as: <strong>{email}</strong></span>
               <button
                 onClick={() => {
                   localStorage.removeItem('userEmail')
                   setIsLoggedIn(false)
                   setEmail('')
                 }}
-                className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition text-sm"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition text-xs sm:text-sm"
               >
                 Logout
               </button>
@@ -571,11 +571,11 @@ export default function ChaletBooking() {
           </div>
 
           {/* Pricing Card */}
-          <div className="bg-blue-50 p-4 rounded-lg mb-4">
-            <h2 className="text-lg font-bold text-gray-800 mb-3">Pricing Table</h2>
-            <div className="grid grid-cols-5 gap-2 text-sm">
+          <div className="bg-blue-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-3">Pricing Table</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 sm:gap-2 text-xs sm:text-sm">
               {Object.entries(PRICING_TABLE).map(([nights, cost]) => (
-                <div key={nights} className="flex justify-between bg-white px-3 py-1 rounded">
+                <div key={nights} className="flex justify-between bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded">
                   <span className="font-medium">{nights}N:</span>
                   <span className="text-blue-600 font-bold">${cost}</span>
                 </div>
@@ -584,39 +584,39 @@ export default function ChaletBooking() {
           </div>
 
           {/* Booking Summary */}
-          <div className="bg-green-50 p-4 rounded-lg">
-            <h2 className="text-lg font-bold text-gray-800 mb-3">Your Booking Summary</h2>
-            <div className="flex gap-6 mb-4">
+          <div className="bg-green-50 p-3 sm:p-4 rounded-lg">
+            <h2 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-3">Your Booking Summary</h2>
+            <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
               <div>
-                <span className="text-sm text-gray-600">Total Nights: </span>
-                <span className="font-bold text-lg">{totalNights}</span>
+                <span className="text-xs sm:text-sm text-gray-600">Total Nights: </span>
+                <span className="font-bold text-base sm:text-lg">{totalNights}</span>
               </div>
               <div>
-                <span className="text-sm text-gray-600">Total Cost Due: </span>
-                <span className="font-bold text-lg text-green-600">${totalCost}</span>
+                <span className="text-xs sm:text-sm text-gray-600">Total Cost Due: </span>
+                <span className="font-bold text-base sm:text-lg text-green-600">${totalCost}</span>
               </div>
             </div>
             {totalNights > 0 && (
-              <div className="border-t border-green-200 pt-3">
-                <div className="mb-3">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Payment via Interac</p>
-                  <div className="flex items-center gap-3 mb-3">
-                    <p className="text-lg font-bold text-gray-900">438 528 7271</p>
+              <div className="border-t border-green-200 pt-2 sm:pt-3">
+                <div className="mb-2 sm:mb-3">
+                  <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Payment via Interac</p>
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                    <p className="text-base sm:text-lg font-bold text-gray-900">438 528 7271</p>
                     <button
                       onClick={copyPhoneNumber}
-                      className={`px-4 py-1 rounded-lg text-sm font-semibold transition ${
+                      className={`px-3 sm:px-4 py-1 rounded-lg text-xs sm:text-sm font-semibold transition ${
                         copied
                           ? 'bg-green-600 text-white'
                           : 'bg-blue-500 text-white hover:bg-blue-600'
                       }`}
                     >
-                      {copied ? 'Copied ✓' : 'Copy Number'}
+                      {copied ? 'Copied ✓' : 'Copy'}
                     </button>
                   </div>
                 </div>
                 <button
                   onClick={togglePayment}
-                  className={`w-full px-6 py-2 rounded-lg font-semibold transition ${
+                  className={`w-full px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base font-semibold transition ${
                     payments[email]
                       ? 'bg-green-600 text-white hover:bg-green-700'
                       : 'bg-orange-500 text-white hover:bg-orange-600'
@@ -630,21 +630,21 @@ export default function ChaletBooking() {
         </div>
 
         {/* Calendar */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Calendar</h2>
+        <div className="bg-white p-3 sm:p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Calendar</h2>
 
           {/* December 2025 */}
-          <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-700 mb-3">December 2025</h3>
-            <div className="grid grid-cols-7 gap-2">
+          <div className="mb-6 sm:mb-8">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-700 mb-2 sm:mb-3">December 2025</h3>
+            <div className="grid grid-cols-7 gap-1 sm:gap-2">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="text-center font-semibold text-gray-600 text-sm py-2">
+                <div key={day} className="text-center font-semibold text-gray-600 text-xs sm:text-sm py-1 sm:py-2">
                   {day}
                 </div>
               ))}
               {generateCalendarDays(2025, 11, 15).map((date, index) => {
                 if (!date) {
-                  return <div key={`empty-${index}`} className="min-h-[120px]" />
+                  return <div key={`empty-${index}`} className="min-h-[90px] sm:min-h-[110px] md:min-h-[120px]" />
                 }
 
                 const bookable = isBookableDate(date)
@@ -659,7 +659,7 @@ export default function ChaletBooking() {
                 return (
                   <div
                     key={date}
-                    className={`group relative min-h-[120px] p-2 rounded-lg border-2 transition ${
+                    className={`group relative min-h-[90px] sm:min-h-[110px] md:min-h-[120px] p-1.5 sm:p-2 rounded-lg border-2 transition ${
                       !bookable
                         ? 'border-gray-100 bg-gray-50 cursor-not-allowed'
                         : userBooked && isPaid
@@ -671,18 +671,18 @@ export default function ChaletBooking() {
                         : 'border-gray-200 bg-white hover:border-blue-300'
                     }`}
                   >
-                    <div className={`text-sm font-bold mb-1 ${!bookable ? 'text-gray-300' : 'text-gray-800'}`}>
+                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable ? 'text-gray-300' : 'text-gray-800'}`}>
                       {day}
                     </div>
                     {bookable && (
                       <>
-                        <div className={`text-xs mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
+                        <div className={`text-xs mb-0.5 sm:mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
                           {available} {available === 1 ? 'seat' : 'seats'}
                         </div>
                         <button
                           onClick={() => toggleBooking(date)}
                           disabled={(isFull && !userBooked) || (userBooked && isPaid)}
-                          className={`w-full py-1 px-1 rounded text-xs font-medium transition mb-2 ${
+                          className={`w-full py-0.5 sm:py-1 px-1 rounded text-xs font-medium transition mb-1 sm:mb-2 ${
                             userBooked && isPaid
                               ? 'bg-green-600 text-white cursor-not-allowed'
                               : userBooked
@@ -695,7 +695,7 @@ export default function ChaletBooking() {
                           {userBooked && isPaid ? 'Paid' : userBooked ? 'Unbook' : isFull ? 'Full' : 'Book'}
                         </button>
                         {(paidBookings.length > 0 || unpaidBookings.length > 0) && (
-                          <div className="hidden group-hover:block text-xs space-y-1 absolute z-10 bg-white border border-gray-300 rounded-lg p-2 shadow-lg mt-1 min-w-[120px]">
+                          <div className="hidden group-hover:block text-xs space-y-1 absolute z-10 bg-white border border-gray-300 rounded-lg p-2 shadow-lg mt-1 min-w-[100px] sm:min-w-[120px]">
                             {paidBookings.map(userEmail => (
                               <div key={userEmail} className="text-green-700 font-medium truncate" title={userEmail}>
                                 ✓ {userEmail.split('@')[0]}
@@ -718,16 +718,16 @@ export default function ChaletBooking() {
 
           {/* January 2026 */}
           <div>
-            <h3 className="text-xl font-bold text-gray-700 mb-3">January 2026</h3>
-            <div className="grid grid-cols-7 gap-2">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-700 mb-2 sm:mb-3">January 2026</h3>
+            <div className="grid grid-cols-7 gap-1 sm:gap-2">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="text-center font-semibold text-gray-600 text-sm py-2">
+                <div key={day} className="text-center font-semibold text-gray-600 text-xs sm:text-sm py-1 sm:py-2">
                   {day}
                 </div>
               ))}
               {generateCalendarDays(2026, 0, 1, 17).map((date, index) => {
                 if (!date) {
-                  return <div key={`empty-${index}`} className="min-h-[120px]" />
+                  return <div key={`empty-${index}`} className="min-h-[90px] sm:min-h-[110px] md:min-h-[120px]" />
                 }
 
                 const bookable = isBookableDate(date)
@@ -742,7 +742,7 @@ export default function ChaletBooking() {
                 return (
                   <div
                     key={date}
-                    className={`group relative min-h-[120px] p-2 rounded-lg border-2 transition ${
+                    className={`group relative min-h-[90px] sm:min-h-[110px] md:min-h-[120px] p-1.5 sm:p-2 rounded-lg border-2 transition ${
                       !bookable
                         ? 'border-gray-100 bg-gray-50 cursor-not-allowed'
                         : userBooked && isPaid
@@ -754,18 +754,18 @@ export default function ChaletBooking() {
                         : 'border-gray-200 bg-white hover:border-blue-300'
                     }`}
                   >
-                    <div className={`text-sm font-bold mb-1 ${!bookable ? 'text-gray-300' : 'text-gray-800'}`}>
+                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable ? 'text-gray-300' : 'text-gray-800'}`}>
                       {day}
                     </div>
                     {bookable && (
                       <>
-                        <div className={`text-xs mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
+                        <div className={`text-xs mb-0.5 sm:mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
                           {available} {available === 1 ? 'seat' : 'seats'}
                         </div>
                         <button
                           onClick={() => toggleBooking(date)}
                           disabled={(isFull && !userBooked) || (userBooked && isPaid)}
-                          className={`w-full py-1 px-1 rounded text-xs font-medium transition mb-2 ${
+                          className={`w-full py-0.5 sm:py-1 px-1 rounded text-xs font-medium transition mb-1 sm:mb-2 ${
                             userBooked && isPaid
                               ? 'bg-green-600 text-white cursor-not-allowed'
                               : userBooked
@@ -778,7 +778,7 @@ export default function ChaletBooking() {
                           {userBooked && isPaid ? 'Paid' : userBooked ? 'Unbook' : isFull ? 'Full' : 'Book'}
                         </button>
                         {(paidBookings.length > 0 || unpaidBookings.length > 0) && (
-                          <div className="hidden group-hover:block text-xs space-y-1 absolute z-10 bg-white border border-gray-300 rounded-lg p-2 shadow-lg mt-1 min-w-[120px]">
+                          <div className="hidden group-hover:block text-xs space-y-1 absolute z-10 bg-white border border-gray-300 rounded-lg p-2 shadow-lg mt-1 min-w-[100px] sm:min-w-[120px]">
                             {paidBookings.map(userEmail => (
                               <div key={userEmail} className="text-green-700 font-medium truncate" title={userEmail}>
                                 ✓ {userEmail.split('@')[0]}
