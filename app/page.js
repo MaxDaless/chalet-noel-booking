@@ -148,6 +148,21 @@ export default function ChaletBooking() {
   const togglePayment = async () => {
     const newPaidStatus = !payments[email]
 
+    // If marking as paid, show confirmation warning
+    if (newPaidStatus) {
+      const confirmed = window.confirm(
+        '⚠️ WARNING: Once you mark your booking as PAID, you will NOT be able to modify or cancel your reservations.\n\n' +
+        'Please confirm that you have:\n' +
+        '1. Sent the Interac payment to 438 528 7271\n' +
+        '2. Verified all your booked nights are correct\n\n' +
+        'Do you want to continue?'
+      )
+
+      if (!confirmed) {
+        return // User cancelled
+      }
+    }
+
     try {
       const res = await fetch('/api/payments', {
         method: 'POST',
