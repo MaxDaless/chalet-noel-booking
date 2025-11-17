@@ -266,6 +266,71 @@ export default function ChaletBooking() {
     return total
   }
 
+  const adminDeleteBooking = async (userEmail, date) => {
+    if (!window.confirm(`Delete booking for ${userEmail} on ${date}?`)) {
+      return
+    }
+
+    try {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, date, action: 'unbook' })
+      })
+
+      if (res.ok) {
+        // Update local state
+        const newBookings = { ...bookings }
+        const dateBookings = newBookings[date] || []
+        newBookings[date] = dateBookings.filter(e => e !== userEmail)
+        if (newBookings[date].length === 0) delete newBookings[date]
+        setBookings(newBookings)
+        alert('Booking deleted successfully')
+      } else {
+        alert('Failed to delete booking')
+      }
+    } catch (error) {
+      console.error('Error deleting booking:', error)
+      alert('Failed to delete booking')
+    }
+  }
+
+  const adminDeleteAllUserBookings = async (userEmail) => {
+    if (!window.confirm(`Delete ALL bookings for ${userEmail}? This cannot be undone!`)) {
+      return
+    }
+
+    try {
+      // Find all dates this user has booked
+      const userDates = Object.entries(bookings)
+        .filter(([date, emails]) => emails.includes(userEmail))
+        .map(([date]) => date)
+
+      // Delete each booking
+      for (const date of userDates) {
+        await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userEmail, date, action: 'unbook' })
+        })
+      }
+
+      // Update local state
+      const newBookings = { ...bookings }
+      userDates.forEach(date => {
+        const dateBookings = newBookings[date] || []
+        newBookings[date] = dateBookings.filter(e => e !== userEmail)
+        if (newBookings[date].length === 0) delete newBookings[date]
+      })
+      setBookings(newBookings)
+
+      alert(`Deleted all bookings for ${userEmail}`)
+    } catch (error) {
+      console.error('Error deleting bookings:', error)
+      alert('Failed to delete all bookings')
+    }
+  }
+
   // ADMIN DASHBOARD - Check this BEFORE login screen
   if (isAdmin) {
     const users = getAllUsers()
@@ -303,7 +368,7 @@ export default function ChaletBooking() {
             </div>
 
             <h2 className="text-xl font-bold text-gray-800 mb-4">User Management</h2>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto mb-8">
               <table className="w-full">
                 <thead className="bg-gray-100">
                   <tr>
@@ -311,6 +376,7 @@ export default function ChaletBooking() {
                     <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Nights</th>
                     <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Total Cost</th>
                     <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Status</th>
+                    <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -331,11 +397,59 @@ export default function ChaletBooking() {
                             {isPaid ? 'Paid' : 'Unpaid'}
                           </span>
                         </td>
+                        <td className="px-4 py-3 text-sm">
+                          <button
+                            onClick={() => adminDeleteAllUserBookings(userEmail)}
+                            className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition"
+                          >
+                            Delete All
+                          </button>
+                        </td>
                       </tr>
                     )
                   })}
                 </tbody>
               </table>
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-800 mb-4">All Bookings by Date</h2>
+            <div className="space-y-4">
+              {CHALET_DATES.map(date => {
+                const dateBookings = bookings[date] || []
+                if (dateBookings.length === 0) return null
+
+                return (
+                  <div key={date} className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 mb-2">
+                      {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                      <span className="ml-2 text-sm text-gray-600">({dateBookings.length} bookings)</span>
+                    </h3>
+                    <div className="space-y-2">
+                      {dateBookings.map(userEmail => (
+                        <div key={userEmail} className="flex items-center justify-between bg-white p-2 rounded">
+                          <span className="text-sm">
+                            {userEmail}
+                            {payments[userEmail] && (
+                              <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Paid</span>
+                            )}
+                          </span>
+                          <button
+                            onClick={() => adminDeleteBooking(userEmail, date)}
+                            className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
