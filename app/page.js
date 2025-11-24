@@ -412,44 +412,267 @@ export default function ChaletBooking() {
               </table>
             </div>
 
-            <h2 className="text-xl font-bold text-gray-800 mb-4">All Bookings by Date</h2>
-            <div className="space-y-4">
-              {CHALET_DATES.map(date => {
-                const dateBookings = bookings[date] || []
-                if (dateBookings.length === 0) return null
+            <h2 className="text-xl font-bold text-gray-800 mb-4">All Bookings by Date - Calendar View</h2>
 
-                return (
-                  <div key={date} className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-800 mb-2">
-                      {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
-                      <span className="ml-2 text-sm text-gray-600">({dateBookings.length} bookings)</span>
-                    </h3>
-                    <div className="space-y-2">
-                      {dateBookings.map(userEmail => (
-                        <div key={userEmail} className="flex items-center justify-between bg-white p-2 rounded">
-                          <span className="text-sm">
-                            {userEmail}
-                            {payments[userEmail] && (
-                              <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Paid</span>
-                            )}
-                          </span>
-                          <button
-                            onClick={() => adminDeleteBooking(userEmail, date)}
-                            className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+            {/* December 2025 Admin Calendar */}
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-gray-700 mb-3">December 2025</h3>
+              <div className="grid grid-cols-7 gap-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="text-center font-semibold text-gray-600 text-sm py-2">
+                    {day}
                   </div>
-                )
-              })}
+                ))}
+                {(() => {
+                  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate()
+                  const generateCalendarDays = (year, month, startDay = 1) => {
+                    const firstDayOfWeek = new Date(year, month, startDay).getDay()
+                    const days = []
+                    for (let i = 0; i < firstDayOfWeek; i++) {
+                      days.push(null)
+                    }
+                    for (let day = startDay; day <= getDaysInMonth(year, month); day++) {
+                      const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                      days.push(date)
+                    }
+                    return days
+                  }
+
+                  return generateCalendarDays(2025, 11, 15).map((date, index) => {
+                    if (!date) {
+                      return <div key={`empty-${index}`} className="min-h-[140px]" />
+                    }
+
+                    const dateBookings = bookings[date] || []
+                    const bookingCount = dateBookings.length
+                    const paidBookings = dateBookings.filter(userEmail => payments[userEmail])
+                    const unpaidBookings = dateBookings.filter(userEmail => !payments[userEmail])
+                    const day = parseInt(date.split('-')[2])
+                    const isBookable = CHALET_DATES.includes(date)
+
+                    // Color grading based on booking count
+                    let bgColor = 'bg-gray-50 border-gray-200'
+                    if (isBookable && bookingCount > 0) {
+                      if (bookingCount >= 10) {
+                        bgColor = 'bg-red-100 border-red-400'
+                      } else if (bookingCount >= 7) {
+                        bgColor = 'bg-orange-200 border-orange-400'
+                      } else if (bookingCount >= 4) {
+                        bgColor = 'bg-yellow-100 border-yellow-400'
+                      } else {
+                        bgColor = 'bg-blue-50 border-blue-300'
+                      }
+                    }
+
+                    return (
+                      <div
+                        key={date}
+                        className={`group relative min-h-[140px] p-2 rounded-lg border-2 transition ${bgColor} ${
+                          !isBookable ? 'opacity-50' : ''
+                        }`}
+                      >
+                        <div className="text-sm font-bold mb-1 text-gray-800">{day}</div>
+                        {isBookable && bookingCount > 0 && (
+                          <>
+                            <div className="text-xs font-semibold mb-2 text-gray-700">
+                              {bookingCount} {bookingCount === 1 ? 'booking' : 'bookings'}
+                            </div>
+                            <div className="text-xs space-y-1">
+                              <div className="text-green-700 font-medium">
+                                ✓ {paidBookings.length} paid
+                              </div>
+                              {unpaidBookings.length > 0 && (
+                                <div className="text-orange-600">
+                                  ⏳ {unpaidBookings.length} unpaid
+                                </div>
+                              )}
+                            </div>
+                            {/* Hover tooltip with full details */}
+                            <div className="hidden group-hover:block absolute z-20 bg-white border-2 border-gray-400 rounded-lg p-3 shadow-xl mt-2 min-w-[250px] left-0 top-full">
+                              <div className="text-sm font-bold mb-2 text-gray-800">
+                                {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </div>
+                              <div className="space-y-1 max-h-60 overflow-y-auto">
+                                {paidBookings.length > 0 && (
+                                  <div className="mb-2">
+                                    <div className="text-xs font-semibold text-green-700 mb-1">Paid:</div>
+                                    {paidBookings.map(userEmail => (
+                                      <div key={userEmail} className="flex items-center justify-between bg-green-50 p-1.5 rounded mb-1">
+                                        <span className="text-xs text-green-800 truncate flex-1" title={userEmail}>
+                                          ✓ {userEmail}
+                                        </span>
+                                        <button
+                                          onClick={() => adminDeleteBooking(userEmail, date)}
+                                          className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition flex-shrink-0"
+                                        >
+                                          Del
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {unpaidBookings.length > 0 && (
+                                  <div>
+                                    <div className="text-xs font-semibold text-orange-600 mb-1">Unpaid:</div>
+                                    {unpaidBookings.map(userEmail => (
+                                      <div key={userEmail} className="flex items-center justify-between bg-orange-50 p-1.5 rounded mb-1">
+                                        <span className="text-xs text-orange-800 truncate flex-1" title={userEmail}>
+                                          ⏳ {userEmail}
+                                        </span>
+                                        <button
+                                          onClick={() => adminDeleteBooking(userEmail, date)}
+                                          className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition flex-shrink-0"
+                                        >
+                                          Del
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )
+                  })
+                })()}
+              </div>
+            </div>
+
+            {/* January 2026 Admin Calendar */}
+            <div>
+              <h3 className="text-lg font-bold text-gray-700 mb-3">January 2026</h3>
+              <div className="grid grid-cols-7 gap-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="text-center font-semibold text-gray-600 text-sm py-2">
+                    {day}
+                  </div>
+                ))}
+                {(() => {
+                  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate()
+                  const generateCalendarDays = (year, month, endDay = null) => {
+                    const actualEndDay = endDay || getDaysInMonth(year, month)
+                    const firstDayOfWeek = new Date(year, month, 1).getDay()
+                    const days = []
+                    for (let i = 0; i < firstDayOfWeek; i++) {
+                      days.push(null)
+                    }
+                    for (let day = 1; day <= actualEndDay; day++) {
+                      const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                      days.push(date)
+                    }
+                    return days
+                  }
+
+                  return generateCalendarDays(2026, 0, 17).map((date, index) => {
+                    if (!date) {
+                      return <div key={`empty-${index}`} className="min-h-[140px]" />
+                    }
+
+                    const dateBookings = bookings[date] || []
+                    const bookingCount = dateBookings.length
+                    const paidBookings = dateBookings.filter(userEmail => payments[userEmail])
+                    const unpaidBookings = dateBookings.filter(userEmail => !payments[userEmail])
+                    const day = parseInt(date.split('-')[2])
+                    const isBookable = CHALET_DATES.includes(date)
+
+                    // Color grading based on booking count
+                    let bgColor = 'bg-gray-50 border-gray-200'
+                    if (isBookable && bookingCount > 0) {
+                      if (bookingCount >= 10) {
+                        bgColor = 'bg-red-100 border-red-400'
+                      } else if (bookingCount >= 7) {
+                        bgColor = 'bg-orange-200 border-orange-400'
+                      } else if (bookingCount >= 4) {
+                        bgColor = 'bg-yellow-100 border-yellow-400'
+                      } else {
+                        bgColor = 'bg-blue-50 border-blue-300'
+                      }
+                    }
+
+                    return (
+                      <div
+                        key={date}
+                        className={`group relative min-h-[140px] p-2 rounded-lg border-2 transition ${bgColor} ${
+                          !isBookable ? 'opacity-50' : ''
+                        }`}
+                      >
+                        <div className="text-sm font-bold mb-1 text-gray-800">{day}</div>
+                        {isBookable && bookingCount > 0 && (
+                          <>
+                            <div className="text-xs font-semibold mb-2 text-gray-700">
+                              {bookingCount} {bookingCount === 1 ? 'booking' : 'bookings'}
+                            </div>
+                            <div className="text-xs space-y-1">
+                              <div className="text-green-700 font-medium">
+                                ✓ {paidBookings.length} paid
+                              </div>
+                              {unpaidBookings.length > 0 && (
+                                <div className="text-orange-600">
+                                  ⏳ {unpaidBookings.length} unpaid
+                                </div>
+                              )}
+                            </div>
+                            {/* Hover tooltip with full details */}
+                            <div className="hidden group-hover:block absolute z-20 bg-white border-2 border-gray-400 rounded-lg p-3 shadow-xl mt-2 min-w-[250px] left-0 top-full">
+                              <div className="text-sm font-bold mb-2 text-gray-800">
+                                {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </div>
+                              <div className="space-y-1 max-h-60 overflow-y-auto">
+                                {paidBookings.length > 0 && (
+                                  <div className="mb-2">
+                                    <div className="text-xs font-semibold text-green-700 mb-1">Paid:</div>
+                                    {paidBookings.map(userEmail => (
+                                      <div key={userEmail} className="flex items-center justify-between bg-green-50 p-1.5 rounded mb-1">
+                                        <span className="text-xs text-green-800 truncate flex-1" title={userEmail}>
+                                          ✓ {userEmail}
+                                        </span>
+                                        <button
+                                          onClick={() => adminDeleteBooking(userEmail, date)}
+                                          className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition flex-shrink-0"
+                                        >
+                                          Del
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {unpaidBookings.length > 0 && (
+                                  <div>
+                                    <div className="text-xs font-semibold text-orange-600 mb-1">Unpaid:</div>
+                                    {unpaidBookings.map(userEmail => (
+                                      <div key={userEmail} className="flex items-center justify-between bg-orange-50 p-1.5 rounded mb-1">
+                                        <span className="text-xs text-orange-800 truncate flex-1" title={userEmail}>
+                                          ⏳ {userEmail}
+                                        </span>
+                                        <button
+                                          onClick={() => adminDeleteBooking(userEmail, date)}
+                                          className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition flex-shrink-0"
+                                        >
+                                          Del
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )
+                  })
+                })()}
+              </div>
             </div>
           </div>
         </div>
