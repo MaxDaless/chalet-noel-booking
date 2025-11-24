@@ -970,6 +970,8 @@ export default function ChaletBooking() {
                               ? 'bg-red-500 text-white hover:bg-red-600'
                               : isFull
                               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : isAdminOnly
+                              ? 'bg-gray-400 text-white hover:bg-gray-500'
                               : 'bg-blue-500 text-white hover:bg-blue-600'
                           }`}
                         >
@@ -1060,6 +1062,8 @@ export default function ChaletBooking() {
                               ? 'bg-red-500 text-white hover:bg-red-600'
                               : isFull
                               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : isAdminOnly
+                              ? 'bg-gray-400 text-white hover:bg-gray-500'
                               : 'bg-blue-500 text-white hover:bg-blue-600'
                           }`}
                         >
