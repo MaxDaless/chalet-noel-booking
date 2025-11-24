@@ -36,6 +36,7 @@ export default function ChaletBooking() {
   const [payments, setPayments] = useState({})
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [userFilter, setUserFilter] = useState('')
 
   // Load data from API and localStorage (for email only)
   useEffect(() => {
@@ -294,6 +295,24 @@ export default function ChaletBooking() {
         newBookings[date] = dateBookings.filter(e => e !== userEmail)
         if (newBookings[date].length === 0) delete newBookings[date]
         setBookings(newBookings)
+
+        // Check if user has any remaining bookings
+        const hasRemainingBookings = Object.values(newBookings).some(emails => emails.includes(userEmail))
+
+        // If no remaining bookings, reset payment status
+        if (!hasRemainingBookings) {
+          await fetch('/api/payments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userEmail, isPaid: false })
+          })
+
+          // Update local payment state
+          const newPayments = { ...payments }
+          delete newPayments[userEmail]
+          setPayments(newPayments)
+        }
+
         alert('Booking deleted successfully')
       } else {
         alert('Failed to delete booking')
@@ -324,6 +343,13 @@ export default function ChaletBooking() {
         })
       }
 
+      // Reset payment status
+      await fetch('/api/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, isPaid: false })
+      })
+
       // Update local state
       const newBookings = { ...bookings }
       userDates.forEach(date => {
@@ -332,6 +358,11 @@ export default function ChaletBooking() {
         if (newBookings[date].length === 0) delete newBookings[date]
       })
       setBookings(newBookings)
+
+      // Reset payment status in local state
+      const newPayments = { ...payments }
+      delete newPayments[userEmail]
+      setPayments(newPayments)
 
       alert(`Deleted all bookings for ${userEmail}`)
     } catch (error) {
@@ -451,6 +482,29 @@ export default function ChaletBooking() {
 
             <h2 className="text-xl font-bold text-gray-800 mb-4">All Bookings by Date - Calendar View</h2>
 
+            {/* User Filter */}
+            <div className="mb-6 flex items-center gap-4">
+              <label className="text-sm font-semibold text-gray-700">Filter by user:</label>
+              <select
+                value={userFilter}
+                onChange={(e) => setUserFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">All Users</option>
+                {Object.keys(users).sort().map(userEmail => (
+                  <option key={userEmail} value={userEmail}>{userEmail}</option>
+                ))}
+              </select>
+              {userFilter && (
+                <button
+                  onClick={() => setUserFilter('')}
+                  className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm"
+                >
+                  Clear Filter
+                </button>
+              )}
+            </div>
+
             {/* December 2025 Admin Calendar */}
             <div className="mb-6">
               <h3 className="text-lg font-bold text-gray-700 mb-3">December 2025</h3>
@@ -481,16 +535,23 @@ export default function ChaletBooking() {
                     }
 
                     const dateBookings = bookings[date] || []
-                    const bookingCount = dateBookings.length
-                    const paidBookings = dateBookings.filter(userEmail => payments[userEmail])
-                    const unpaidBookings = dateBookings.filter(userEmail => !payments[userEmail])
+                    // Filter bookings by selected user
+                    const filteredBookings = userFilter
+                      ? dateBookings.filter(userEmail => userEmail === userFilter)
+                      : dateBookings
+                    const bookingCount = filteredBookings.length
+                    const paidBookings = filteredBookings.filter(userEmail => payments[userEmail])
+                    const unpaidBookings = filteredBookings.filter(userEmail => !payments[userEmail])
                     const day = parseInt(date.split('-')[2])
                     const isBookable = CHALET_DATES.includes(date)
 
                     // Color grading based on booking count
                     let bgColor = 'bg-gray-50 border-gray-200'
                     if (isBookable && bookingCount > 0) {
-                      if (bookingCount >= 10) {
+                      // When filtering by user, highlight their bookings in purple
+                      if (userFilter) {
+                        bgColor = 'bg-purple-100 border-purple-400'
+                      } else if (bookingCount >= 10) {
                         bgColor = 'bg-red-100 border-red-400'
                       } else if (bookingCount >= 7) {
                         bgColor = 'bg-orange-200 border-orange-400'
@@ -612,16 +673,23 @@ export default function ChaletBooking() {
                     }
 
                     const dateBookings = bookings[date] || []
-                    const bookingCount = dateBookings.length
-                    const paidBookings = dateBookings.filter(userEmail => payments[userEmail])
-                    const unpaidBookings = dateBookings.filter(userEmail => !payments[userEmail])
+                    // Filter bookings by selected user
+                    const filteredBookings = userFilter
+                      ? dateBookings.filter(userEmail => userEmail === userFilter)
+                      : dateBookings
+                    const bookingCount = filteredBookings.length
+                    const paidBookings = filteredBookings.filter(userEmail => payments[userEmail])
+                    const unpaidBookings = filteredBookings.filter(userEmail => !payments[userEmail])
                     const day = parseInt(date.split('-')[2])
                     const isBookable = CHALET_DATES.includes(date)
 
                     // Color grading based on booking count
                     let bgColor = 'bg-gray-50 border-gray-200'
                     if (isBookable && bookingCount > 0) {
-                      if (bookingCount >= 10) {
+                      // When filtering by user, highlight their bookings in purple
+                      if (userFilter) {
+                        bgColor = 'bg-purple-100 border-purple-400'
+                      } else if (bookingCount >= 10) {
                         bgColor = 'bg-red-100 border-red-400'
                       } else if (bookingCount >= 7) {
                         bgColor = 'bg-orange-200 border-orange-400'
