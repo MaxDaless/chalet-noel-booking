@@ -931,16 +931,14 @@ export default function ChaletBooking() {
                 const unpaidBookings = getUnpaidBookingsForDate(date)
                 const day = parseInt(date.split('-')[2])
 
-                // Hide admin-only dates from regular users unless they have bookings on that date
+                // Admin-only dates: hide booking details from regular users
                 const isAdminOnly = ADMIN_ONLY_DATES.includes(date)
-                const dateHasBookings = (bookings[date] || []).length > 0
-                const shouldHideFromUser = isAdminOnly && !userBooked && !dateHasBookings
 
                 return (
                   <div
                     key={date}
                     className={`group relative min-h-[90px] sm:min-h-[110px] md:min-h-[120px] p-1.5 sm:p-2 rounded-lg border-2 transition ${
-                      !bookable || shouldHideFromUser
+                      !bookable
                         ? 'border-gray-100 bg-gray-50 cursor-not-allowed'
                         : userBooked && isPaid
                         ? 'border-green-600 bg-green-100'
@@ -951,14 +949,17 @@ export default function ChaletBooking() {
                         : 'border-gray-200 bg-white hover:border-blue-300'
                     }`}
                   >
-                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable || shouldHideFromUser ? 'text-gray-300' : 'text-gray-800'}`}>
+                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable ? 'text-gray-300' : 'text-gray-800'}`}>
                       {day}
                     </div>
-                    {bookable && !shouldHideFromUser && (
+                    {bookable && (
                       <>
-                        <div className={`text-xs mb-0.5 sm:mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
-                          {available} {available === 1 ? 'seat' : 'seats'}
-                        </div>
+                        {/* Hide seat availability on admin-only dates */}
+                        {!isAdminOnly && (
+                          <div className={`text-xs mb-0.5 sm:mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
+                            {available} {available === 1 ? 'seat' : 'seats'}
+                          </div>
+                        )}
                         <button
                           onClick={() => toggleBooking(date)}
                           disabled={(isFull && !userBooked) || (userBooked && isPaid)}
@@ -974,7 +975,8 @@ export default function ChaletBooking() {
                         >
                           {userBooked && isPaid ? 'Paid' : userBooked ? 'Unbook' : isFull ? 'Full' : 'Book'}
                         </button>
-                        {(paidBookings.length > 0 || unpaidBookings.length > 0) && (
+                        {/* Hide booking tooltips on admin-only dates */}
+                        {!isAdminOnly && (paidBookings.length > 0 || unpaidBookings.length > 0) && (
                           <div className="hidden group-hover:block text-xs space-y-1 absolute z-10 bg-white border border-gray-300 rounded-lg p-2 shadow-lg mt-1 min-w-[100px] sm:min-w-[120px]">
                             {paidBookings.map(userEmail => (
                               <div key={userEmail} className="text-green-700 font-medium truncate" title={userEmail}>
@@ -1019,16 +1021,14 @@ export default function ChaletBooking() {
                 const unpaidBookings = getUnpaidBookingsForDate(date)
                 const day = parseInt(date.split('-')[2])
 
-                // Hide admin-only dates from regular users unless they have bookings on that date
+                // Admin-only dates: hide booking details from regular users
                 const isAdminOnly = ADMIN_ONLY_DATES.includes(date)
-                const dateHasBookings = (bookings[date] || []).length > 0
-                const shouldHideFromUser = isAdminOnly && !userBooked && !dateHasBookings
 
                 return (
                   <div
                     key={date}
                     className={`group relative min-h-[90px] sm:min-h-[110px] md:min-h-[120px] p-1.5 sm:p-2 rounded-lg border-2 transition ${
-                      !bookable || shouldHideFromUser
+                      !bookable
                         ? 'border-gray-100 bg-gray-50 cursor-not-allowed'
                         : userBooked && isPaid
                         ? 'border-green-600 bg-green-100'
@@ -1039,14 +1039,17 @@ export default function ChaletBooking() {
                         : 'border-gray-200 bg-white hover:border-blue-300'
                     }`}
                   >
-                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable || shouldHideFromUser ? 'text-gray-300' : 'text-gray-800'}`}>
+                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable ? 'text-gray-300' : 'text-gray-800'}`}>
                       {day}
                     </div>
-                    {bookable && !shouldHideFromUser && (
+                    {bookable && (
                       <>
-                        <div className={`text-xs mb-0.5 sm:mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
-                          {available} {available === 1 ? 'seat' : 'seats'}
-                        </div>
+                        {/* Hide seat availability on admin-only dates */}
+                        {!isAdminOnly && (
+                          <div className={`text-xs mb-0.5 sm:mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
+                            {available} {available === 1 ? 'seat' : 'seats'}
+                          </div>
+                        )}
                         <button
                           onClick={() => toggleBooking(date)}
                           disabled={(isFull && !userBooked) || (userBooked && isPaid)}
@@ -1062,7 +1065,8 @@ export default function ChaletBooking() {
                         >
                           {userBooked && isPaid ? 'Paid' : userBooked ? 'Unbook' : isFull ? 'Full' : 'Book'}
                         </button>
-                        {(paidBookings.length > 0 || unpaidBookings.length > 0) && (
+                        {/* Hide booking tooltips on admin-only dates */}
+                        {!isAdminOnly && (paidBookings.length > 0 || unpaidBookings.length > 0) && (
                           <div className="hidden group-hover:block text-xs space-y-1 absolute z-10 bg-white border border-gray-300 rounded-lg p-2 shadow-lg mt-1 min-w-[100px] sm:min-w-[120px]">
                             {paidBookings.map(userEmail => (
                               <div key={userEmail} className="text-green-700 font-medium truncate" title={userEmail}>
