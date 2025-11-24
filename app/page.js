@@ -7,7 +7,16 @@ const CHALET_DATES = [
   '2025-12-24', '2025-12-25', '2025-12-26', '2025-12-27', '2025-12-28',
   '2025-12-29', '2025-12-30', '2025-12-31',
   '2026-01-01', '2026-01-02', '2026-01-03',
-  '2026-01-09', '2026-01-10', '2026-01-16', '2026-01-17',
+  '2026-01-05', '2026-01-06', '2026-01-07', '2026-01-08',
+  '2026-01-09', '2026-01-10',
+  '2026-01-12', '2026-01-13', '2026-01-14', '2026-01-15',
+  '2026-01-16', '2026-01-17',
+]
+
+// Admin-only dates (weekdays) - hidden from regular users unless they have bookings
+const ADMIN_ONLY_DATES = [
+  '2026-01-05', '2026-01-06', '2026-01-07', '2026-01-08',
+  '2026-01-12', '2026-01-13', '2026-01-14', '2026-01-15',
 ]
 
 const PRICING_TABLE = {
@@ -922,11 +931,16 @@ export default function ChaletBooking() {
                 const unpaidBookings = getUnpaidBookingsForDate(date)
                 const day = parseInt(date.split('-')[2])
 
+                // Hide admin-only dates from regular users unless they have bookings on that date
+                const isAdminOnly = ADMIN_ONLY_DATES.includes(date)
+                const dateHasBookings = (bookings[date] || []).length > 0
+                const shouldHideFromUser = isAdminOnly && !userBooked && !dateHasBookings
+
                 return (
                   <div
                     key={date}
                     className={`group relative min-h-[90px] sm:min-h-[110px] md:min-h-[120px] p-1.5 sm:p-2 rounded-lg border-2 transition ${
-                      !bookable
+                      !bookable || shouldHideFromUser
                         ? 'border-gray-100 bg-gray-50 cursor-not-allowed'
                         : userBooked && isPaid
                         ? 'border-green-600 bg-green-100'
@@ -937,10 +951,10 @@ export default function ChaletBooking() {
                         : 'border-gray-200 bg-white hover:border-blue-300'
                     }`}
                   >
-                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable ? 'text-gray-300' : 'text-gray-800'}`}>
+                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable || shouldHideFromUser ? 'text-gray-300' : 'text-gray-800'}`}>
                       {day}
                     </div>
-                    {bookable && (
+                    {bookable && !shouldHideFromUser && (
                       <>
                         <div className={`text-xs mb-0.5 sm:mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
                           {available} {available === 1 ? 'seat' : 'seats'}
@@ -1005,11 +1019,16 @@ export default function ChaletBooking() {
                 const unpaidBookings = getUnpaidBookingsForDate(date)
                 const day = parseInt(date.split('-')[2])
 
+                // Hide admin-only dates from regular users unless they have bookings on that date
+                const isAdminOnly = ADMIN_ONLY_DATES.includes(date)
+                const dateHasBookings = (bookings[date] || []).length > 0
+                const shouldHideFromUser = isAdminOnly && !userBooked && !dateHasBookings
+
                 return (
                   <div
                     key={date}
                     className={`group relative min-h-[90px] sm:min-h-[110px] md:min-h-[120px] p-1.5 sm:p-2 rounded-lg border-2 transition ${
-                      !bookable
+                      !bookable || shouldHideFromUser
                         ? 'border-gray-100 bg-gray-50 cursor-not-allowed'
                         : userBooked && isPaid
                         ? 'border-green-600 bg-green-100'
@@ -1020,10 +1039,10 @@ export default function ChaletBooking() {
                         : 'border-gray-200 bg-white hover:border-blue-300'
                     }`}
                   >
-                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable ? 'text-gray-300' : 'text-gray-800'}`}>
+                    <div className={`text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 ${!bookable || shouldHideFromUser ? 'text-gray-300' : 'text-gray-800'}`}>
                       {day}
                     </div>
-                    {bookable && (
+                    {bookable && !shouldHideFromUser && (
                       <>
                         <div className={`text-xs mb-0.5 sm:mb-1 ${isFull ? 'text-red-600' : 'text-gray-600'} cursor-help`}>
                           {available} {available === 1 ? 'seat' : 'seats'}
