@@ -340,6 +340,31 @@ export default function ChaletBooking() {
     }
   }
 
+  const adminTogglePayment = async (userEmail) => {
+    const newPaidStatus = !payments[userEmail]
+
+    try {
+      const res = await fetch('/api/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, isPaid: newPaidStatus })
+      })
+
+      if (res.ok) {
+        // Update local state
+        setPayments({
+          ...payments,
+          [userEmail]: newPaidStatus
+        })
+      } else {
+        alert('Failed to update payment status. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error updating payment:', error)
+      alert('Failed to update payment status. Please try again.')
+    }
+  }
+
   // ADMIN DASHBOARD - Check this BEFORE login screen
   if (isAdmin) {
     const users = getAllUsers()
@@ -398,13 +423,16 @@ export default function ChaletBooking() {
                         <td className="px-4 py-3 text-sm">{data.nights}</td>
                         <td className="px-4 py-3 text-sm font-semibold">${totalCost}</td>
                         <td className="px-4 py-3 text-sm">
-                          <span className={`px-3 py-1 rounded-full font-medium ${
-                            isPaid
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-orange-100 text-orange-700'
-                          }`}>
+                          <button
+                            onClick={() => adminTogglePayment(userEmail)}
+                            className={`px-3 py-1 rounded-full font-medium transition cursor-pointer ${
+                              isPaid
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                            }`}
+                          >
                             {isPaid ? 'Paid' : 'Unpaid'}
-                          </span>
+                          </button>
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <button
